@@ -20,22 +20,53 @@
 
   <label for="journee">Journée :</label>
   <select id="journee">
-    <script>
-      for (let j = 1; j <= 38; j++) {
-        document.write(`<option value="${j}">Journée ${j}</option>`);
-      }
-    </script>
+    <!-- Les options seront ajoutées par JavaScript en fonction de la saison -->
   </select>
 
   <br>
   <button onclick="goToClassement()">Voir le classement</button>
 
   <script>
+    // Fonction pour ajuster le nombre de journées selon la saison choisie
+    function updateJournees() {
+      const annee = document.getElementById('annee').value;
+      const journeeSelect = document.getElementById('journee');
+
+      // Effacer les anciennes options de journée
+      journeeSelect.innerHTML = "";
+
+      let nombreJournees;
+
+      // Nombre de journées selon la saison
+      if (annee === "2010-2011") {
+        nombreJournees = 42;  // Saison 2010-2011 a 42 journées
+      } else if (annee === "2019-2020") {
+        nombreJournees = 28;  // Saison 2019-2020 a 28 journées
+      } else {
+        nombreJournees = 38;  // Par défaut, toutes les autres saisons ont 38 journées
+      }
+
+      // Ajouter les options de journée dans le menu déroulant
+      for (let i = 1; i <= nombreJournees; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = `Journée ${i}`;
+        journeeSelect.appendChild(option);
+      }
+    }
+
+    // Fonction pour rediriger vers la page de classement
     function goToClassement() {
       const annee = document.getElementById('annee').value;
       const journee = document.getElementById('journee').value;
       window.location.href = `classement.html?annee=${annee}&journee=${journee}`;
     }
+
+    // Appeler la fonction pour la première fois lors du chargement de la page
+    document.getElementById('annee').addEventListener('change', updateJournees);
+
+    // Initialiser le menu déroulant au chargement de la page pour la première saison
+    updateJournees();
   </script>
 </body>
 </html>
