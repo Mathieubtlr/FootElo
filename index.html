@@ -1,50 +1,102 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classement Elo - Football</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-        h1 {
-            color: #2C3E50;
-        }
-        ul {
-            list-style-type: none;
-        }
-        li {
-            margin: 10px;
-        }
-        a {
-            text-decoration: none;
-            color: #2980B9;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Classement Elo - Journée</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #2C3E50;
+    }
+    table {
+      width: 80%;
+      margin: 20px auto;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
 
-    <h1>Classement Elo des Clubs de Football</h1>
-    <p>Accédez à chaque journée pour voir les classements à cette période.</p>
+  <h1 id="titre">Chargement...</h1>
 
-    <ul>
-        <li><a href="journee0.html">Journée 0</a></li>
-        <li><a href="journee1.html">Journée 1</a></li>
-        <li><a href="journee2.html">Journée 2</a></li>
-        <li><a href="journee3.html">Journée 3</a></li>
-        <li><a href="journee4.html">Journée 4</a></li>
-        <li><a href="journee5.html">Journée 5</a></li>
-        <li><a href="journee6.html">Journée 6</a></li>
-        <li><a href="journee7.html">Journée 7</a></li>
-        <li><a href="journee8.html">Journée 8</a></li>
-        <li><a href="journee9.html">Journée 9</a></li>
-    </ul>
+  <table id="classement-table">
+    <thead>
+      <tr>
+        <th>Club</th>
+        <th>Score Elo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Les lignes seront insérées ici -->
+    </tbody>
+  </table>
+
+  <div class="error" id="erreur"></div>
+
+  <script>
+    // Fonction pour obtenir les paramètres d'URL
+    function getQueryParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        annee: params.get('annee'),
+        journee: params.get('journee')
+      };
+    }
+
+    // Fonction pour charger et afficher un CSV
+    function loadCSV(path) {
+      fetch(path)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Fichier introuvable");
+          }
+          return response.text();
+        })
+        .then(data => {
+          const lignes = data.trim().split('\n');
+          const tbody = document.querySelector("#classement-table tbody");
+          tbody.innerHTML = ''; // vide le tableau
+          lignes.forEach(ligne => {
+            const [club, score] = ligne.split(',');
+            if (club && score) {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `<td>${club}</td><td>${parseFloat(score).toFixed(2)}</td>`;
+              tbody.appendChild(tr);
+            }
+          });
+        })
+        .catch(error => {
+          document.getElementById("erreur").textContent = "Erreur : " + error.message;
+        });
+    }
+
+    // Initialisation
+    const { annee, journee } = getQueryParams();
+
+    if (annee && journee) {
+      document.getElementById("titre").textContent = `Classement Elo - ${annee} - Journée ${journee}`;
+      const chemin = `data/${annee}/journee${journee}.csv`;
+      loadCSV(chemin);
+    } else {
+      document.getElementById("erreur").textContent = "Paramètres 'annee' et 'journee' manquants dans l'URL.";
+    }
+  </script>
 
 </body>
 </html>
